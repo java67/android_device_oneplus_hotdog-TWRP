@@ -25,6 +25,12 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import /init.recovery.qcom_decrypt.rc
+
+on init
+    start boot-1-0
+    start time_daemon
+
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
@@ -36,14 +42,25 @@ on fs
     # this is for OnePlus 7 Pro 5g stock rom flashing
     symlink /dev/block/bootdevice/by-name/mdm_oem_stanvbk /dev/block/bootdevice/by-name/mdm_oem_stanvbk_a
     symlink /dev/block/bootdevice/by-name/mdm_oem_stanvbk /dev/block/bootdevice/by-name/mdm_oem_stanvbk_b
-    chmod 0660 /dev/qseecom
-    chown system drmrpc /dev/qseecom
-    chmod 0664 /dev/ion
-    chown system system /dev/ion
-    install_keyring
 
-    export ANDROID_ROOT /system_root
-    
-on early-fs
-    start vold
+on boot
+    setprop sys.usb.config adb
+
+on property:sys.usb.config=mtp,adb
+    restart time_daemon
+
+on property:vendor.sys.listeners.registered=true
+    restart time_daemon
+
+service boot-1-0 /sbin/android.hardware.boot@1.0-service
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service time_daemon /sbin/time_daemon
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
 
