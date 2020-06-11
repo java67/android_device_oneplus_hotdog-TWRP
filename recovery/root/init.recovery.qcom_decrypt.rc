@@ -1,6 +1,5 @@
-#
-# The below code is needed for both FDE and FBE devices
-#
+import /init.recovery.qcom_decrypt.fbe.rc
+
 on fs
     # needed to make qseecomd work in recovery
     chmod 0660 /dev/qseecom
@@ -21,7 +20,17 @@ on property:init.svc.sbinqseecomd=running && property:vendor.sys.listeners.regis
     start sbinhwservicemanager
 
 on property:init.svc.sbinhwservicemanager=running && property:hwservicemanager.ready=true
+    start sbinkeymaster-3-0
+    start sbinkeymaster-3-0-qti
     start sbinkeymaster-4-0-qti
+
+on property:ro.crypto.fs_crypto_blkdev=*
+    setprop crypto.ready 0
+    stop sbinqseecomd
+    stop sbinhwservicemanager
+    stop sbinkeymaster-3-0
+    stop sbinkeymaster-3-0-qti
+    stop sbinkeymaster-4-0-qti
 
 service prepdecrypt /sbin/prepdecrypt.sh
     user root
@@ -44,57 +53,23 @@ service sbinhwservicemanager /sbin/hwservicemanager
     disabled
     seclabel u:r:recovery:s0
 
-service sbinkeymaster-4-0-qti /sbin/android.hardware.keymaster@4.0-service-qti
+service sbinkeymaster-3-0 /sbin/android.hardware.keymaster@3.0-service
     user root
     group root
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/sbin
     disabled
     seclabel u:r:recovery:s0
 
-#
-# The below code is needed for FBE support ONLY in addition to the above code
-#
-on early-fs
-    start vold
-
-on fs
-    install_keyring
-
-on property:vendor.sys.listeners.registered=true
-    start servicemanager
-    start gatekeeper-1-0
-
-#on property:twrp.all.users.decrypted=true
-#    setprop crypto.ready 0
-#    stop sbinqseecomd
-#    stop servicemanager
-#    stop gatekeeper-1-0
-#    stop sbinhwservicemanager
-#    stop sbinkeymaster-4-0-qti
-
-service gatekeeper-1-0 /sbin/android.hardware.gatekeeper@1.0-service-qti
+service sbinkeymaster-3-0-qti /sbin/android.hardware.keymaster@3.0-service-qti
     user root
     group root
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/sbin
     disabled
     seclabel u:r:recovery:s0
 
-service keystore_auth /sbin/keystore_auth
-    oneshot
-    user system
+service sbinkeymaster-4-0-qti /sbin/android.hardware.keymaster@4.0-service-qti
+    user root
     group root
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/sbin
     disabled
     seclabel u:r:recovery:s0
-
-# keystore is started and stopped on demand by TWRP
-service keystore /sbin/keystore /tmp/misc/keystore
-    user root
-    group root drmrpc readproc
-    disabled
-    seclabel u:r:recovery:s0
-
-service servicemanager /sbin/servicemanager
-    user root
-    group root readproc
-    disabled
-    seclabel u:r:recovery:s0
-

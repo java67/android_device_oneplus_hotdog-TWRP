@@ -90,7 +90,6 @@ BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
 
 # Partitions (listed in the file) to be wiped under recovery.
 TARGET_RECOVERY_WIPE := device/oneplus/hotdog/recovery.wipe
-TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/recovery.fstab
 
 # Workaround for error copying vendor files to recovery ramdisk
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
@@ -137,6 +136,9 @@ AB_OTA_PARTITIONS += \
 # Encryption
 VENDOR_SECURITY_PATCH := 2099-12-31
 PLATFORM_SECURITY_PATCH := $(VENDOR_SECURITY_PATCH)
+TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_CRYPTO_FBE := true
+TW_INCLUDE_FBE_METADATA_DECRYPT := true
 BOARD_USES_METADATA_PARTITION := true
 
 # Extras
@@ -150,4 +152,4 @@ TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
 TW_EXCLUDE_TWRPAPP := true
 TW_NO_USB_STORAGE := true
-#PLATFORM_VERSION := 16.1.0
+PLATFORM_VERSION := 16.1.0
