@@ -52,13 +52,13 @@ on property:sys.usb.config=mtp,adb
 on property:vendor.sys.listeners.registered=true
     restart time_daemon
 
-service boot-1-0 /sbin/android.hardware.boot@1.0-service
+service boot-1-0 /system/bin/android.hardware.boot@1.0-service
     user root
     group root
     disabled
     seclabel u:r:recovery:s0
 
-service time_daemon /sbin/time_daemon
+service time_daemon /system/bin/hw/time_daemon
     user root
     group root
     disabled
