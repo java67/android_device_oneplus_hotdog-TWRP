@@ -27,7 +27,6 @@ PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl-wrapper \
     android.hardware.boot@1.0-impl-recovery \
     bootctrl.$(PRODUCT_PLATFORM) \
-    bootctrl.$(PRODUCT_PLATFORM).recovery \
 
 PRODUCT_HOST_PACKAGES += \
     libgptutils \
